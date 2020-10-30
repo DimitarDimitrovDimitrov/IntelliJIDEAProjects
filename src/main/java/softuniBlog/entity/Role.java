@@ -4,8 +4,8 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Table
-@Entity(name = "roles")
+@Entity
+@Table(name = "roles")
 public class Role {
     private Integer id;
     private String name;

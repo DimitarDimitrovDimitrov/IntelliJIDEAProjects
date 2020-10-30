@@ -1,4 +1,5 @@
 package softuniBlog.config;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +9,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import softuniBlog.service.BlogUserDetailsService;
 
@@ -16,8 +18,8 @@ import softuniBlog.service.BlogUserDetailsService;
 @EnableWebSecurity
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-    private BlogUserDetailsService userDetailsService;
+//ermagerd Blog instead of user?
+    private UserDetailsService userDetailsService;
 
     @Autowired
     public WebSecurityConfig(BlogUserDetailsService blogUserDetailsService){

@@ -9,9 +9,10 @@ public class HomeController {
 
     @GetMapping("/")
     public String index(Model model){
-        model.addAttribute("view","home/index");
+        model.addAttribute("view" ,"home/index");
         return "base-layout";
     }
 
 
 }
+

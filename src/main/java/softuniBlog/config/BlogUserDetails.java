@@ -35,18 +35,19 @@ public class BlogUserDetails extends User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities()
-        {
+        {//Takes thymeleaf version 3.0.11
             String userRoles = StringUtils.join(this.roles, ",");
             return AuthorityUtils.commaSeparatedStringToAuthorityList(userRoles);
         }
 
-
+    @Override
     public String getUsername() {
-        return null;
+        return user.getFullName();
     }
 
-    public String getUser()
+
+    public User getUser()
 {
-    return this.user.getFullName();
+    return this.user;
 }
 }
