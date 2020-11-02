@@ -55,5 +55,61 @@ public class ArticleController {
         model.addAttribute("view","article/details");
         return "base-layout";
         }
+
+        @GetMapping ("/article/edit/{id}")
+        @PreAuthorize("isAuthenticated()")
+        public String edit(@PathVariable Integer id, Model model)
+        {
+            if(!this.articleRepository.existsById(id)){
+                return "redirect:/";
+            }
+            Article article = this.articleRepository.getOne(id);
+
+            model.addAttribute("view","article/edit");
+            model.addAttribute("article",article);
+            return "base-layout";
+        }
+
+        @PostMapping("/article/edit/{id}")
+        @PreAuthorize("isAuthenticated()")
+    public String editProcess(@PathVariable Integer id, ArticleBindingModel articleBindingModel)
+        {
+            if(!this.articleRepository.existsById(id)){
+                return "redirect:/";
+            }
+            Article article = this.articleRepository.getOne(id);
+
+            article.setContent(articleBindingModel.getContent());
+            article.setTitle(articleBindingModel.getTitle());
+
+            this.articleRepository.saveAndFlush(article);
+
+            return "redirect:/article/" + article.getId();
+        }
+
+@GetMapping("/article/delete/{id}")
+@PreAuthorize("isAuthenticated()")
+    public String delete(Model model, @PathVariable Integer id) {
+        if(!this.articleRepository.existsById(id)){
+            return "redirect:/";
+        }
+        Article article = this.articleRepository.getOne(id);
+
+        model.addAttribute("article",article);
+        model.addAttribute("view", "article/delete");
+        return "base-layout";
+}
+
+@PostMapping("/article/delete/{id}")
+@PreAuthorize("isAuthenticated()")
+public String deleteProcess(@PathVariable Integer id){
+        if(!this.articleRepository.existsById(id)){
+            return "redirect:/";
+        }
+        Article article = this.articleRepository.getOne(id);
+        this.articleRepository.delete(article);
+        return "redirect:/";
+}
+
 }
 
