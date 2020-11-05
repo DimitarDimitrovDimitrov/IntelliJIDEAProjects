@@ -4,6 +4,11 @@ package softuniBlog.bindingModel;
 import com.sun.istack.NotNull;
 
 public class ArticleBindingModel {
+    private Integer categoryId;
+
+    public Integer getCategoryId(){return categoryId;}
+
+    public void setCategoryId(Integer categoryId){this.categoryId = categoryId;}
 
     @NotNull
     private String title;

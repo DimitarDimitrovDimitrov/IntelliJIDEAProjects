@@ -2,6 +2,7 @@ package softuniBlog.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -11,12 +12,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import softuniBlog.bindingModel.ArticleBindingModel;
 import softuniBlog.entity.Article;
+import softuniBlog.entity.Category;
 import softuniBlog.entity.User;
 import softuniBlog.repository.ArticleRepository;
+import softuniBlog.repository.CategoryRepository;
 import softuniBlog.repository.UserRepository;
+
+import java.util.List;
 
 @Controller
 public class ArticleController {
+@Autowired
+private CategoryRepository categoryRepository;
 
     @Autowired
     private ArticleRepository articleRepository;
@@ -26,8 +33,11 @@ public class ArticleController {
     @GetMapping("/article/create")
     @PreAuthorize("isAuthenticated()")
     public String create(Model model){
+List<Category> categories = this.categoryRepository.findAll();
 
         model.addAttribute("view", "article/create");
+      model.addAttribute("categories",categories);
+
       return "base-layout";
     }
 
@@ -38,9 +48,11 @@ public class ArticleController {
                 .getAuthentication().getPrincipal();
 
         User userEntity = this.userRepository.findByEmail(user.getUsername());
+        Category category = this.categoryRepository.getOne(articleBindingModel.getCategoryId());
+
         Article articleEntity = new Article(
                 articleBindingModel.getTitle(),articleBindingModel.getContent(),
-                userEntity);
+                userEntity,category);
         this.articleRepository.saveAndFlush(articleEntity);
         return "redirect:/";
     }
@@ -50,6 +62,12 @@ public class ArticleController {
         if (!this.articleRepository.existsById(id)) {
         return "redirect:/";
         }
+        //newstuff
+    if(!(SecurityContextHolder.getContext().getAuthentication()instanceof AnonymousAuthenticationToken)){
+        UserDetails principal = (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User entityUser = this.userRepository.findByEmail(principal.getUsername());
+        model.addAttribute("user",entityUser);
+    }
         Article article = this.articleRepository.getOne(id);
         model.addAttribute("article",article);
         model.addAttribute("view","article/details");
@@ -65,8 +83,16 @@ public class ArticleController {
             }
             Article article = this.articleRepository.getOne(id);
 
+
+            if(!isUserAuthorOrAdmin(article)){
+                return "redirect:/article/" + id;
+            }
+            List<Category> categories = this.categoryRepository.findAll();
+
             model.addAttribute("view","article/edit");
             model.addAttribute("article",article);
+            model.addAttribute("categories",categories);
+
             return "base-layout";
         }
 
@@ -79,6 +105,14 @@ public class ArticleController {
             }
             Article article = this.articleRepository.getOne(id);
 
+
+            if(!isUserAuthorOrAdmin(article)){
+                return "redirect:/article/" + id;
+            }
+
+            Category category = this.categoryRepository.getOne(articleBindingModel.getCategoryId());
+
+            article.setCategory(category);
             article.setContent(articleBindingModel.getContent());
             article.setTitle(articleBindingModel.getTitle());
 
@@ -94,6 +128,10 @@ public class ArticleController {
             return "redirect:/";
         }
         Article article = this.articleRepository.getOne(id);
+        //further check needed
+    if(!isUserAuthorOrAdmin(article)){
+        return "redirect:/article/" + id;
+    }
 
         model.addAttribute("article",article);
         model.addAttribute("view", "article/delete");
@@ -107,9 +145,19 @@ public String deleteProcess(@PathVariable Integer id){
             return "redirect:/";
         }
         Article article = this.articleRepository.getOne(id);
+        //further check needed
+    if(!isUserAuthorOrAdmin(article)){
+        return "redirect:/article/" + id;
+    }
         this.articleRepository.delete(article);
+
         return "redirect:/";
 }
+private  boolean isUserAuthorOrAdmin(Article article){
+        UserDetails user = (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User userEntity = this.userRepository.findByEmail(user.getUsername());
+        return userEntity.isAdmin() || userEntity.isAuthor(article);
 
+}
 }
 
