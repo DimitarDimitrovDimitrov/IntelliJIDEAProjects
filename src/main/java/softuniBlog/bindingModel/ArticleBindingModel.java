@@ -4,7 +4,17 @@ package softuniBlog.bindingModel;
 import com.sun.istack.NotNull;
 
 public class ArticleBindingModel {
-    private Integer categoryId;
+	private String tagString;
+	
+    public String getTagString() {
+		return tagString;
+	}
+
+	public void setTagString(String tagString) {
+		this.tagString = tagString;
+	}
+
+	private Integer categoryId;
 
     public Integer getCategoryId(){return categoryId;}
 

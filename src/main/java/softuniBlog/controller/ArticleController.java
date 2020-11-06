@@ -13,15 +13,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import softuniBlog.bindingModel.ArticleBindingModel;
 import softuniBlog.entity.Article;
 import softuniBlog.entity.Category;
+import softuniBlog.entity.Tag;
 import softuniBlog.entity.User;
 import softuniBlog.repository.ArticleRepository;
 import softuniBlog.repository.CategoryRepository;
+import softuniBlog.repository.TagRepository;
 import softuniBlog.repository.UserRepository;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class ArticleController {
+	@Autowired
+	private TagRepository tagRepository;
 @Autowired
 private CategoryRepository categoryRepository;
 
@@ -49,10 +55,11 @@ List<Category> categories = this.categoryRepository.findAll();
 
         User userEntity = this.userRepository.findByEmail(user.getUsername());
         Category category = this.categoryRepository.getOne(articleBindingModel.getCategoryId());
+        HashSet<Tag> tags = this.findTagsFromString(articleBindingModel.getTagString());
 
         Article articleEntity = new Article(
                 articleBindingModel.getTitle(),articleBindingModel.getContent(),
-                userEntity,category);
+                userEntity,category,tags);
         this.articleRepository.saveAndFlush(articleEntity);
         return "redirect:/";
     }
@@ -88,10 +95,12 @@ List<Category> categories = this.categoryRepository.findAll();
                 return "redirect:/article/" + id;
             }
             List<Category> categories = this.categoryRepository.findAll();
-
+String tagString = article.getTags().stream().map(Tag::getName).collect(Collectors.joining(", "));
+            
             model.addAttribute("view","article/edit");
             model.addAttribute("article",article);
             model.addAttribute("categories",categories);
+            model.addAttribute("tags",tagString);
 
             return "base-layout";
         }
@@ -111,10 +120,12 @@ List<Category> categories = this.categoryRepository.findAll();
             }
 
             Category category = this.categoryRepository.getOne(articleBindingModel.getCategoryId());
-
+            HashSet<Tag>tags = this.findTagsFromString(articleBindingModel.getTagString());
+            
             article.setCategory(category);
             article.setContent(articleBindingModel.getContent());
             article.setTitle(articleBindingModel.getTitle());
+            article.setTags(tags);
 
             this.articleRepository.saveAndFlush(article);
 
@@ -159,5 +170,22 @@ private  boolean isUserAuthorOrAdmin(Article article){
         return userEntity.isAdmin() || userEntity.isAuthor(article);
 
 }
+
+private HashSet<Tag>findTagsFromString(String tagString){
+	HashSet<Tag> tags = new HashSet<>();
+	String[]tagNames = tagString.split(",\\s*");
+	
+	for(String tagName : tagNames) {
+		Tag currentTag = this.tagRepository.findByName(tagName);
+		
+		if(currentTag == null) {
+			currentTag = new Tag(tagName);
+			this.tagRepository.saveAndFlush(currentTag);
+		}
+		tags.add(currentTag);
+	}
+	return tags;
+}
+
 }
 
