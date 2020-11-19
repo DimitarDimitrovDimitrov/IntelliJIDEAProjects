@@ -1,5 +1,8 @@
 package softuniBlog.config;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +14,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+
 import softuniBlog.service.BlogUserDetailsService;
 
 @Configuration
@@ -44,4 +49,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf();
     }
+    //resource handlers for imgs
+    
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    	//expose image directory
+    	   
+        registry.addResourceHandler(
+        		
+                "/webjars/**",
+                "/img/**",
+                "/css/**",
+                "/js/**")
+                .addResourceLocations(
+                        "classpath:/META-INF/resources/webjars/",
+                        "classpath:/user-photos/",
+                        "classpath:/static/css/",
+                        "classpath:/static/js/");
+       
+    }
+  
+     
+    
+    
 }

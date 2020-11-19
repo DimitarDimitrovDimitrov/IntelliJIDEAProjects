@@ -15,8 +15,18 @@ public class UserBindingModel {
 
     @NotNull
     private String confirmPassword;
+    //for img upload
+    private byte[] photos;
 
-    public String getFullName() {
+    public byte[] getPhotos() {
+		return photos;
+	}
+
+	public void setPhotos(byte[] photos) {
+		this.photos = photos;
+	}
+
+	public String getFullName() {
         return fullName;
     }
 
@@ -47,4 +57,8 @@ public class UserBindingModel {
     public void setEmail(String email) {
         this.email = email;
     }
+
+	
+	
+	
 }

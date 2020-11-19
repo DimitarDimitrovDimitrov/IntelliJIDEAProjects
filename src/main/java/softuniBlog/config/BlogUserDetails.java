@@ -27,7 +27,7 @@ public class BlogUserDetails extends User implements UserDetails {
 
     public BlogUserDetails(User user,ArrayList<String> roles)
     {
-        super(user.getEmail(), user.getFullName(),user.getPassword());
+        super(user.getEmail(), user.getFullName(),user.getPassword(), user.getPhotos());
      this.roles = roles;
      this.user = user;
 
@@ -50,4 +50,8 @@ public class BlogUserDetails extends User implements UserDetails {
 {
     return this.user;
 }
+    
+    
+    
+    
 }

@@ -1,8 +1,16 @@
 <main>
+  
     <div class="container body-container">
         <div class="row">
+  
+ <form method="POST" th:action="@{/profile}" enctype="multipart/form-data" >
+            <input type="file" name="user" multiple="multiple"/>
+            <input type="submit" value="upload" />
+</form>
+<img alt="${profile.filename}" src="${pageContext.request.contextPath}/image/${user.getphotos}">
             <div id="main" class="col-sm-9">
                 <div>
+          
                     <span th:text="${user.email}"></span>
                     <br/>
                     <span th:text="${user.fullName}"></span>
@@ -10,4 +18,7 @@
             </div>
         </div>
     </div>
+   
+   
+
 </main>

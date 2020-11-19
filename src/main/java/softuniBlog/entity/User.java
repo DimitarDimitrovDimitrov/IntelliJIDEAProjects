@@ -14,13 +14,25 @@ public class User {
     private String password;
     private Set<Role> roles;
     private Set<Article> articles;
-
-    public User(String email, String fullName, String password) {
+   
+   @Column(name = "photos")
+    private byte[] photos;
+ 
+    
+   
+	public byte[] getPhotos() {
+		return photos;
+	}
+	public void setPhotos(byte[] photos) {
+		this.photos = photos;
+	}
+	public User(String email, String fullName, String password, byte[] photos) {
         this.email = email;
         this.fullName = fullName;
         this.password = password;
         this.roles = new HashSet<>();
         this.articles = new HashSet<>();
+        this.photos = photos;
 
     }
 @OneToMany(mappedBy = "author")
@@ -97,4 +109,14 @@ public class User {
     public boolean isAuthor(Article article){
         return Objects.equals(this.getId(),article.getAuthor().getId());
 }
+//img upload start
+@Transient
+public String getPhotosImagePath() {
+    if (photos == null || id == null) return null;
+     
+    return "/user-photos/" + id + "/" + photos;
+}
+
+
+//img upload end
 }
